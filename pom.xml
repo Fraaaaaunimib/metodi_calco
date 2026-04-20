@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <dependencies>
+        <dependency>
+    <groupId>org.ejml</groupId>
+    <artifactId>ejml-simple</artifactId>
+    <version>0.44.0</version>
+</dependency>
+    </dependencies>
+
+    <groupId>com.mycompany.app</groupId>
+  <artifactId>my-module</artifactId>
+  <version>1</version>
+</project>
