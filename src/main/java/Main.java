@@ -7,7 +7,7 @@ public class Main {
         try {
             // Legge il file .mtx e lo carica in una matrice sparsa
             // DMatrixSparseCSC è il formato ideale per matrici con molti zeri
-            DMatrixSparseCSC matrice = MatrixIO.loadMatrixMarketDCSC("percorso/del/tuo/file.mtx");
+            DMatrixSparseCSC matrice = MatrixIO.loadMatrixMarketDCSC("/workspaces/metodi_calco/spa1.mtx");
 
             System.out.println("Matrice caricata con successo!");
             System.out.println("Righe: " + matrice.numRows);
