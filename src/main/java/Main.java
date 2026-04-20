@@ -2,7 +2,7 @@ import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.ops.MatrixIO;
 import java.io.IOException;
 
-public class CaricaMatrice {
+public class Main {
     public static void main(String[] args) {
         try {
             // Legge il file .mtx e lo carica in una matrice sparsa
