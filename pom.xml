@@ -1,13 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
     <dependencies>
         <dependency>
     <groupId>org.ejml</groupId>
-    <artifactId>ejml-simple</artifactId>
+    <artifactId>ejml-all</artifactId>
     <version>0.44.0</version>
 </dependency>
     </dependencies>
 
+    <properties>
+        <maven.compiler.release>11</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <groupId>com.mycompany.app</groupId>
-  <artifactId>my-module</artifactId>
-  <version>1</version>
+    <artifactId>my-module</artifactId>
+    <version>1</version>
 </project>
