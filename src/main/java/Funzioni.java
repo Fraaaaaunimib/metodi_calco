@@ -1,7 +1,9 @@
+package com.funzioni;
 import org.ejml.data.DMatrixSparseCSC;
 import java.io.File;
 import java.util.Scanner;
 import java.io.IOException;
+
 
 public class Funzioni {
     public static DMatrixSparseCSC caricaMatriceManualmente(String percorso) { // Metodo per caricare una matrice da un file .mtx
@@ -54,6 +56,16 @@ public class Funzioni {
         return true;
     }
 
-    
+
+    public static double normaInfinito(double[] v, double[] w){
+        double max = 0.0;
+        for(int i = 0; i < v.length; i++) {
+            double diff = Math.abs(v[i] - w[i]);
+            if(diff > max) {
+                max = diff;
+            }
+        }
+        return max;
+    }
 
 }
