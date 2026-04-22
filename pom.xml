@@ -1,5 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>com.mycompany.app</groupId>
+    <artifactId>my-module</artifactId>
+    <version>1</version>
     <dependencies>
         <dependency>
     <groupId>org.ejml</groupId>
@@ -25,8 +28,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <groupId>com.mycompany.app</groupId>
-    <artifactId>my-module</artifactId>
-    <version>1</version>
 </project>

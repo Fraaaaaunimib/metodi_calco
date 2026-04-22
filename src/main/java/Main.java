@@ -1,7 +1,6 @@
 import org.ejml.data.DMatrixSparseCSC;
-import java.io.File;
-import java.util.Scanner;
-import java.io.IOException;
+import com.funzioni.Funzioni;
+import com.metodi.Jacobi;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,7 +9,7 @@ public class Main {
         Jacobi jacobi = new Jacobi();
         double[] b = new double[matrice.numRows];
         for(int i = 0; i < b.length; i++) {
-            b[i] = (double) (Math.random()*100);
+            b[i] = Math.random()*100;
         }
         double[] x0 = new double[matrice.numRows];
         for(int i = 0; i < b.length; i++) {

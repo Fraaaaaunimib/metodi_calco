@@ -36,16 +36,11 @@ public class Funzioni {
             double valore = scanner.nextDouble();
             matrice.set(righe, colonne, valore);
         }
+
+        scanner.close();
+        
         return matrice;
-        /*for(int i = 0; i < 5; i++) { // Stampa i primi 5x4 elementi non zero della matrice
-            for(int j = 0; j < 4; j++) {
-                double valore = matrice.get(i, j);
-                if(valore != 0) {
-                    System.out.println("Elemento (" + i + ", " + j + "): " + valore);
-                }
-            }
-        }*/
-    } 
+    }
 
     public static boolean diagonaleZeri(DMatrixSparseCSC A) {
         for(int i = 0; i < A.numRows; i++) {
