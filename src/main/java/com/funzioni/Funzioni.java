@@ -26,8 +26,6 @@ public class Funzioni {
         System.out.println("Righe: " + numRighe);
         System.out.println("Colonne: " + numColonne);
         System.out.println("Non zero: " + nnz);
-        
-        System.out.println("Caricamento matrice:");
 
         DMatrixSparseCSC matrice = new DMatrixSparseCSC(numRighe, numColonne, nnz); // Crea una matrice sparsa con il numero di righe, colonne e non zero specificati
         for(int i = 0; i < nnz; i++) {
@@ -64,3 +62,4 @@ public class Funzioni {
     }
 
 }
+

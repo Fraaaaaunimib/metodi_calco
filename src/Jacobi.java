@@ -1,21 +1,24 @@
-package com.metodi;
-import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
-import com.funzioni.*;
+import com.funzioni.Funzioni;
+import java.io.File;
 import java.util.Arrays;
+import java.util.Scanner;
+import java.io.IOException;
+import java.text.DecimalFormat;
+
 
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
 public class Jacobi {
 
     // Implementazione del metodo di Jacobi per risolvere il sistema lineare Ax = b
-    public Risultato jacobi(final DMatrixSparseCSC A, final DMatrixRMaj b, final DMatrixRMaj x0, final int maxIter, final double tol) {
+    public double[] jacobi(DMatrixSparseCSC A, double[] b, double[] x0, int maxIter, double tol) {
         int n = A.numCols;
         int m = A.numRows;
-        int L = x0.getNumRows();
+        int L = x0.length;
         if(n!=m){
             System.out.println("La matrice A deve essere quadrata.");
             return null;
@@ -45,48 +48,31 @@ public class Jacobi {
         }
 
 
-        DMatrixSparseCSC B = new DMatrixSparseCSC(A.numRows, A.numCols);
+        DMatrixSparseCSC B = new DMatrixSparseCSC(numRows, numCols);
         CommonOps_DSCC.add(1.0, D, -1.0, A, B, null, null); // Calcola B = D - A
 
-        DMatrixRMaj xOld = x0.copy();
-        DMatrixRMaj xNew = xOld.copy();
-        for (int i = 0; i < xOld.getNumRows(); i++) {
-            xNew.set(i, xOld.get(i)+1.0);
-        }
-        DMatrixRMaj diffOld = new DMatrixRMaj(xOld.getNumRows(), 1);
-
-        CommonOps_DDRM.subtract(DMatrixRMaj.wrap(xNew.getNumRows(), 1, xNew.getData()), xOld, diffOld);
-
+        double[] xOld = x0.clone();
+        double[] xNew = Arrays.copyOf(xOld, xOld.length+1);
         int nit = 0;
-        DMatrixRMaj bVec = new DMatrixRMaj(b);
-        DMatrixRMaj temp = new DMatrixRMaj(A.numRows, 1);
+
 
         long inizio = System.nanoTime();
-        while(NormOps_DDRM.normPInf(diffOld) > tol && nit < maxIter){
-            xOld = xNew.copy();
-            CommonOps_DSCC.mult(B, xOld, temp);
+        while(Funzioni.normaInfinito(xNew, xOld) > tol && nit < maxIter){
+            xOld = xNew.clone();
+            DMatrixRMaj bVec = new DMatrixRMaj(b);
+            DMatrixRMaj temp = new DMatrixRMaj(numRows, 1);
+            CommonOps_DDRM.mult(B, xOld, temp);
             CommonOps_DDRM.addEquals(temp, bVec);
             CommonOps_DDRM.elementMult(dInv, temp, temp);
             nit++;
-            CommonOps_DDRM.subtract(temp, xOld, diffOld);
-            xNew = temp.copy();
         }
         long durata = System.nanoTime() - inizio;
-        double tempoSecondi = durata / 1_000_000_000.0;
-        
-        // Costruisci soluzione esatta: vettore di tutti 1
-        DMatrixRMaj xEsatta = new DMatrixRMaj(xNew.getNumRows(), 1);
-        for(int i = 0; i < xEsatta.getNumRows(); i++) {
-            xEsatta.set(i, 1.0);
-        }
+        DecimalFormat secondi = new DecimalFormat().format(durata);
 
-        // Calcola differenza xNew - xEsatta
-        DMatrixRMaj diffErr = new DMatrixRMaj(xNew.getNumRows(), 1);
-        CommonOps_DDRM.subtract(xNew, xEsatta, diffErr);
+        DMatrixRMaj diff = new DMatrixRMaj(xNew.length, 1);
+        double err = (NormOps_DDRM.normPInf(CommonOps_DDRM.subtract(xNew, xOld,diff)) / NormOps_DDRM.normPInf(xNew));
 
-        // Errore relativo
-        double err = NormOps_DDRM.normPInf(diffErr) / NormOps_DDRM.normPInf(xEsatta);
-        return new Risultato(xNew, nit, tempoSecondi, err);
+        return new double[]{Double.parseDouble(secondi), nit, err};
     }
 
 }
