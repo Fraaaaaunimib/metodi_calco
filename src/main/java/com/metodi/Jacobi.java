@@ -50,12 +50,14 @@ public class Jacobi {
 
         DMatrixRMaj xOld = x0.copy();
         DMatrixRMaj xNew = xOld.copy();
-        for (int i = 0; i < xOld.getNumRows(); i++) {
+       /* for (int i = 0; i < xOld.getNumRows(); i++) {
             xNew.set(i, xOld.get(i)+1.0);
-        }
-        DMatrixRMaj diffOld = new DMatrixRMaj(xOld.getNumRows(), 1);
+        } */
 
-        CommonOps_DDRM.subtract(DMatrixRMaj.wrap(xNew.getNumRows(), 1, xNew.getData()), xOld, diffOld);
+        DMatrixRMaj diffOld = new DMatrixRMaj(xOld.getNumRows(), 1);
+        Arrays.fill(diffOld.data, Double.MAX_VALUE);
+
+       // CommonOps_DDRM.subtract(DMatrixRMaj.wrap(xNew.getNumRows(), 1, xNew.getData()), xOld, diffOld);
 
         int nit = 0;
         DMatrixRMaj bVec = new DMatrixRMaj(b);
