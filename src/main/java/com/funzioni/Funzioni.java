@@ -1,5 +1,8 @@
 package com.funzioni;
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
+import org.ejml.sparse.csc.CommonOps_DSCC;
+
 import java.io.File;
 import java.util.Scanner;
 import java.io.IOException;
@@ -61,5 +64,20 @@ public class Funzioni {
         return max;
     }
 
+    public static DMatrixSparseCSC triang_inf(final DMatrixSparseCSC A){
+        DMatrixSparseCSC aT = A.copy();
+        for(int i = 0; i<A.numRows;i++){
+            for(int j = 0; j<A.numRows; j++){
+                if(j>i){
+                    aT.set(j, i, 0.0);
+                }
+            }
+        }
+        return aT;
+    }
+
+    public static void solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B){
+
+    }
 }
 

@@ -50,9 +50,6 @@ public class Jacobi {
 
         DMatrixRMaj xOld = x0.copy();
         DMatrixRMaj xNew = xOld.copy();
-       /* for (int i = 0; i < xOld.getNumRows(); i++) {
-            xNew.set(i, xOld.get(i)+1.0);
-        } */
 
         DMatrixRMaj diffOld = new DMatrixRMaj(xOld.getNumRows(), 1);
         Arrays.fill(diffOld.data, Double.MAX_VALUE);
