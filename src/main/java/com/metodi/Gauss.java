@@ -10,7 +10,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
-public class gauss{
+public class Gauss{
     public Risultato gauss(DMatrixSparseCSC A, DMatrixRMaj b, DMatrixRMaj x0, int maxIter, double tol) {
         int m = A.numRows;
         int n = A.numCols;
