@@ -40,52 +40,59 @@ public class Jacobi {
         CommonOps_DSCC.diag(D, diagValues.data, 0, A.numRows); 
 
         DMatrixRMaj dInv = new DMatrixRMaj(A.numRows, 1);
-        for (int i = 0; i < A.numRows; i++) {
-            dInv.set(i, 1.0 / diagValues.get(i, 0));
+        for(int i = 0; i < diagValues.getNumRows(); i++) {
+            dInv.set(i, 0, 1.0 / diagValues.get(i, 0));
         }
-
 
         DMatrixSparseCSC B = new DMatrixSparseCSC(A.numRows, A.numCols);
         CommonOps_DSCC.add(1.0, D, -1.0, A, B, null, null); // Calcola B = D - A
 
-        DMatrixRMaj xOld = x0.copy();
-        DMatrixRMaj xNew = xOld.copy();
-
-        DMatrixRMaj diffOld = new DMatrixRMaj(xOld.getNumRows(), 1);
-        Arrays.fill(diffOld.data, Double.MAX_VALUE);
-
-       // CommonOps_DDRM.subtract(DMatrixRMaj.wrap(xNew.getNumRows(), 1, xNew.getData()), xOld, diffOld);
+        DMatrixRMaj x = new DMatrixRMaj(x0);
 
         int nit = 0;
-        DMatrixRMaj bVec = new DMatrixRMaj(b);
-        DMatrixRMaj temp = new DMatrixRMaj(A.numRows, 1);
+        DMatrixRMaj diff = new DMatrixRMaj(n, 1);
+        DMatrixRMaj temp = new DMatrixRMaj(n, 1);
+
+        double normaDiff = calcoloNormaDiff(A, x, b, diff);
 
         long inizio = System.nanoTime();
-        while(NormOps_DDRM.normPInf(diffOld) > tol && nit < maxIter){
-            xOld = xNew.copy();
-            CommonOps_DSCC.mult(B, xOld, temp);
-            CommonOps_DDRM.addEquals(temp, bVec);
-            CommonOps_DDRM.elementMult(dInv, temp, temp);
+        
+        while(normaDiff > tol && nit < maxIter){
+            CommonOps_DSCC.mult(A, x, temp);
+            CommonOps_DDRM.subtract(b, temp, temp);
+            CommonOps_DDRM.elementDiv(temp, diagValues, temp);
+            CommonOps_DDRM.addEquals(x, temp);
+
             nit++;
-            CommonOps_DDRM.subtract(temp, xOld, diffOld);
-            xNew = temp.copy();
+            normaDiff = calcoloNormaDiff(A, x, b, diff);
         }
         long durata = System.nanoTime() - inizio;
         double tempoSecondi = durata / 1_000_000_000.0;
         
         // Costruisci soluzione esatta: vettore di tutti 1
-        DMatrixRMaj xEsatta = new DMatrixRMaj(xNew.getNumRows(), 1);
+        DMatrixRMaj xEsatta = new DMatrixRMaj(x.getNumRows(), 1);
         for(int i = 0; i < xEsatta.getNumRows(); i++) {
             xEsatta.set(i, 1.0);
         }
 
         // Calcola differenza xNew - xEsatta
-        DMatrixRMaj diffErr = new DMatrixRMaj(xNew.getNumRows(), 1);
-        CommonOps_DDRM.subtract(xNew, xEsatta, diffErr);
+        DMatrixRMaj diffErr = new DMatrixRMaj(x.getNumRows(), 1);
+        CommonOps_DDRM.subtract(x, xEsatta, diffErr);
 
         // Errore relativo
         double err = NormOps_DDRM.normPInf(diffErr) / NormOps_DDRM.normPInf(xEsatta);
-        return new Risultato(xNew, nit, tempoSecondi, err);
+        return new Risultato(x, nit, tempoSecondi, err);
+    }
+
+    public double calcoloNormaDiff(final DMatrixSparseCSC A, final DMatrixRMaj x0, final DMatrixRMaj b, final DMatrixRMaj workspace) {
+        // ||A * x0 - b||_inf / ||b||_inf
+        CommonOps_DSCC.mult(A, x0, workspace);
+        CommonOps_DDRM.subtract(workspace, b, workspace);
+        double normaDiff =NormOps_DDRM.normPInf(workspace);
+        double normaInf = NormOps_DDRM.normPInf(b);
+        normaDiff = normaDiff / normaInf;
+
+        return normaDiff;
     }
 
 }
