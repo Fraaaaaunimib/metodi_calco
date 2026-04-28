@@ -65,19 +65,57 @@ public class Funzioni {
     }
 
     public static DMatrixSparseCSC triang_inf(final DMatrixSparseCSC A){
-        DMatrixSparseCSC aT = A.copy();
-        for(int i = 0; i<A.numRows;i++){
-            for(int j = 0; j<A.numRows; j++){
-                if(j>i){
-                    aT.set(j, i, 0.0);
-                }
+    DMatrixSparseCSC aT = A.copy();
+    for(int i = 0; i < A.numRows; i++){
+        for(int j = 0; j < A.numCols; j++){
+            if(j > i){ // Se l'indice di colonna è maggiore di quello di riga
+                aT.set(i, j, 0.0); // Azzera l'elemento sopra la diagonale
             }
         }
-        return aT;
+    }
+    return aT;
     }
 
-    public static void solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B){
+    public static void solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B) {
+    int n = L.numCols;
+    double[] bData = B.data;
 
+    // Sostituzione in avanti ottimizzata per il formato a colonne (CSC)
+    for (int j = 0; j < n; j++) {
+        // 1. Troviamo l'elemento sulla diagonale L(j,j)
+        double diag = 0;
+        int start = L.col_idx[j];
+        int end = L.col_idx[j+1];
+
+        // Cerchiamo la diagonale nella colonna j
+        for (int k = start; k < end; k++) {
+            if (L.nz_rows[k] == j) {
+                diag = L.nz_values[k];
+                break;
+            }
+        }
+
+        if (Math.abs(diag) < 1e-15) continue;
+
+        // 2. Calcoliamo il valore definitivo dell'incognita j
+        bData[j] /= diag;
+
+        // 3. Aggiorniamo (sottraiamo) l'effetto di x(j) su tutte le righe sottostanti
+        // Questo è il segreto: scorriamo la COLONNA, che in CSC è velocissimo!
+        for (int k = start; k < end; k++) {
+            int riga = L.nz_rows[k];
+            if (riga > j) {
+                bData[riga] -= L.nz_values[k] * bData[j];
+            }
+        }
+    }
+}
+public static void ritornoValori(double tol, Risultato r){
+            System.out.print("| Tol = " + tol);
+            System.out.print(" | Iterazioni = " + r.getNit());
+            System.out.print(" | Errore = " + r.getErrore());
+            System.out.println(" | Tempo = " + r.getTempo() + " | ");
+            System.out.println("----------------------");
     }
 }
 
