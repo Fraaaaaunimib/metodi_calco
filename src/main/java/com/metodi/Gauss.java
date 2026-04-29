@@ -86,7 +86,7 @@ CommonOps_DDRM.subtract(b, Bx, temp);
     }
 
     long durata = System.nanoTime() - inizio;
-    double erroreFinale = NormOps_DDRM.normPInf(temp); // Semplificazione per l'errore
+    double erroreFinale = NormOps_DDRM.normP2(temp); // Semplificazione per l'errore
 
     return new Risultato(xNew, nit, durata / 1e9, erroreFinale);
 }

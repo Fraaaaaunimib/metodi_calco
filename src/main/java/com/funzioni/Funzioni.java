@@ -52,7 +52,7 @@ public class Funzioni {
         return true;
     }
 
-
+    //da rimuovere?
     public static double normaInfinito(double[] v, double[] w){
         double max = 0.0;
         for(int i = 0; i < v.length; i++) {
