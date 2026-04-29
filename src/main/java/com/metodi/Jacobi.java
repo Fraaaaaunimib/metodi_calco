@@ -54,7 +54,7 @@ public class Jacobi {
         DMatrixRMaj diff = new DMatrixRMaj(n, 1);
         DMatrixRMaj temp = new DMatrixRMaj(n, 1);
 
-        double normaDiff = calcoloNormaDiff(A, x, b, diff);
+        double normaDiff = Funzioni.calcoloNormaDiff(A, x, b, diff);
 
         long inizio = System.nanoTime();
 
@@ -65,7 +65,7 @@ public class Jacobi {
             CommonOps_DDRM.addEquals(x, temp);
 
             nit++;
-            normaDiff = calcoloNormaDiff(A, x, b, diff);
+            normaDiff = Funzioni.calcoloNormaDiff(A, x, b, diff);
         }
         long durata = System.nanoTime() - inizio;
         double tempoSecondi = durata / 1_000_000_000.0;
@@ -85,16 +85,6 @@ public class Jacobi {
         return new Risultato(x, nit, tempoSecondi, err);
     }
 
-    public double calcoloNormaDiff(final DMatrixSparseCSC A, final DMatrixRMaj x0, final DMatrixRMaj b,
-            final DMatrixRMaj workspace) {
-        // ||A * x0 - b||_inf / ||b||_inf
-        CommonOps_DSCC.mult(A, x0, workspace);
-        CommonOps_DDRM.subtract(workspace, b, workspace);
-        double normaDiff = NormOps_DDRM.normP2(workspace);
-        double normaInf = NormOps_DDRM.normP2(b);
-        normaDiff = normaDiff / normaInf;
-
-        return normaDiff;
-    }
+    
 
 }

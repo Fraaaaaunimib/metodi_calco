@@ -1,6 +1,8 @@
 package com.funzioni;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
 import java.io.File;
@@ -76,46 +78,38 @@ public class Funzioni {
     return aT;
     }
 
-    public static void solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B) {
-    int n = L.numCols;
-    double[] bData = B.data;
+    public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B) {
+        double sum = 0.0; int i = 0; int j = 0;
+        DMatrixRMaj X = new DMatrixRMaj(L.numRows);
 
-    // Sostituzione in avanti ottimizzata per il formato a colonne (CSC)
-    for (int j = 0; j < n; j++) {
-        // 1. Troviamo l'elemento sulla diagonale L(j,j)
-        double diag = 0;
-        int start = L.col_idx[j];
-        int end = L.col_idx[j+1];
-
-        // Cerchiamo la diagonale nella colonna j
-        for (int k = start; k < end; k++) {
-            if (L.nz_rows[k] == j) {
-                diag = L.nz_values[k];
-                break;
+        for(i = 0; i< L.numRows; i++){
+            for(j = 0; j < i; j++){
+                sum += L.get(i, j) * X.get(j);
             }
+            X.set(i, (1.0 / L.get(i, j)) * (B.get(i) - sum));
         }
 
-        if (Math.abs(diag) < 1e-15) continue;
+        return X;
 
-        // 2. Calcoliamo il valore definitivo dell'incognita j
-        bData[j] /= diag;
-
-        // 3. Aggiorniamo (sottraiamo) l'effetto di x(j) su tutte le righe sottostanti
-        // Questo è il segreto: scorriamo la COLONNA, che in CSC è velocissimo!
-        for (int k = start; k < end; k++) {
-            int riga = L.nz_rows[k];
-            if (riga > j) {
-                bData[riga] -= L.nz_values[k] * bData[j];
-            }
-        }
     }
-}
 public static void ritornoValori(double tol, Risultato r){
             System.out.print("| Tol = " + tol);
             System.out.print(" | Iterazioni = " + r.getNit());
             System.out.print(" | Errore = " + r.getErrore());
             System.out.println(" | Tempo = " + r.getTempo() + " | ");
             System.out.println("----------------------");
+    }
+
+    public static double calcoloNormaDiff(final DMatrixSparseCSC A, final DMatrixRMaj x0, final DMatrixRMaj b,
+            final DMatrixRMaj workspace) {
+        // ||A * x0 - b||_inf / ||b||_inf
+        CommonOps_DSCC.mult(A, x0, workspace);
+        CommonOps_DDRM.subtract(workspace, b, workspace);
+        double normaDiff = NormOps_DDRM.normP2(workspace);
+        double normaInf = NormOps_DDRM.normP2(b);
+        normaDiff = normaDiff / normaInf;
+
+        return normaDiff;
     }
 }
 
