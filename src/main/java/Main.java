@@ -5,6 +5,7 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 import com.funzioni.*;
 import com.metodi.Gauss;
 import com.metodi.Jacobi;
+import com.metodi.gradient;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,7 +19,7 @@ public class Main {
         double[] tolleranze = {1e-4, 1e-6, 1e-8, 1e-10};
 
         Jacobi jacobi = new Jacobi();
-        Gauss gauss = new Gauss();
+        //Gauss gauss = new Gauss();
 
         int numMatrice = 0;
 
@@ -43,13 +44,20 @@ public class Main {
             Risultato rJacobi = jacobi.jacobi(matrice, b, x0, 10000, tol);
             Funzioni.ritornoValori(tol, rJacobi);
             }
-
+ /*
             System.out.println("Metodo di Gauss:");
             for(double tol : tolleranze) {
             Risultato rGauss = Gauss.gauss(matrice, b, x0, 10000, tol);
             Funzioni.ritornoValori(tol, rGauss);
-            }
+            }*/
             System.out.println("");
+
+            System.out.println("Metodo del gradiente:");
+            for(double tol : tolleranze) {
+            Risultato rGradiente = gradient.gradiente(matrice, b, x0, 10000, tol);
+            Funzioni.ritornoValori(tol, rGradiente);
+            }
+            
             numMatrice++;
     }
 

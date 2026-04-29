@@ -26,8 +26,7 @@ public class Gauss{
     }
 
     // 1. PRE-CALCOLO (Fuori dal while per la massima velocità)
-    DMatrixSparseCSC A_triang = new DMatrixSparseCSC(n, n);
-    A_triang = Funzioni.triang_inf(A);
+    DMatrixSparseCSC A_triang = Funzioni.triang_inf(A);
     
     DMatrixSparseCSC B = new DMatrixSparseCSC(n, n);
     CommonOps_DSCC.add(1.0, A, -1.0, A_triang, B, null, null);

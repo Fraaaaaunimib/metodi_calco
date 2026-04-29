@@ -3,7 +3,11 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.interfaces.decomposition.CholeskySparseDecomposition_F64;
 import org.ejml.sparse.csc.CommonOps_DSCC;
+import org.ejml.sparse.csc.factory.DecompositionFactory_DSCC;
+import org.ejml.sparse.csc.factory.DecompositionFactory_DSCC;
+import org.ejml.interfaces.decomposition.CholeskySparseDecomposition_F64;
 
 import java.io.File;
 import java.util.Scanner;
@@ -67,7 +71,7 @@ public class Funzioni {
     }
 
     public static DMatrixSparseCSC triang_inf(final DMatrixSparseCSC A){
-    DMatrixSparseCSC aT = A.copy();
+    DMatrixSparseCSC aT = new DMatrixSparseCSC(A.numRows, A.numCols, 0);
     for(int i = 0; i < A.numRows; i++){
         for(int j = 0; j < A.numCols; j++){
             if(j > i){ // Se l'indice di colonna è maggiore di quello di riga
@@ -78,6 +82,7 @@ public class Funzioni {
     return aT;
     }
 
+    /*
     public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B) {
         double sum = 0.0; int i = 0; int j = 0;
         DMatrixRMaj X = new DMatrixRMaj(L.numRows);
@@ -92,6 +97,21 @@ public class Funzioni {
         return X;
 
     }
+*/
+
+public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B){
+    int n = L.numRows;
+    DMatrixRMaj X = new DMatrixRMaj(n,1);
+    for (int i = 0; i < n; i++){
+        double sum = 0.0;
+        for (int j = 0; j < i; j++){
+            sum += L.get(i,j) * X.get(j);
+        }
+        X.set(i, (B.get(i) - sum) / L.get(i,i));
+    }
+    return X;
+}
+
 public static void ritornoValori(double tol, Risultato r){
             System.out.print("| Tol = " + tol);
             System.out.print(" | Iterazioni = " + r.getNit());
@@ -110,6 +130,26 @@ public static void ritornoValori(double tol, Risultato r){
         normaDiff = normaDiff / normaInf;
 
         return normaDiff;
+    }
+
+    public static boolean metodoPotenze(DMatrixSparseCSC A, int nMax, double tol){
+        DMatrixRMaj z = new DMatrixRMaj(A.numRows, 1);
+        DMatrixRMaj q = new DMatrixRMaj(A.numRows, 1);
+        q.fill(1.0);
+
+        NormOps_DDRM.normalizeF(q);
+        double lambda = 0.0;
+        for(int i = 0; i < nMax; i++){
+            CommonOps_DSCC.mult(A, q, z);
+            double zNorma = NormOps_DDRM.normP2(z);
+            DMatrixRMaj q1 = new DMatrixRMaj(A.numRows, 1);
+            CommonOps_DDRM.divide(z, zNorma, q1);
+            DMatrixRMaj q1T = new DMatrixRMaj(1, A.numRows);
+            CommonOps_DDRM.transpose(q1T);
+            CommonOps_DSCC.mult(A, q1, q1);
+            lambda = CommonOps_DDRM.dot(q1, q1T);
+            
+        }
     }
 }
 
