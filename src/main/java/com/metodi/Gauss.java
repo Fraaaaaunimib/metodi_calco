@@ -47,7 +47,12 @@ public class Gauss{
     // Prima del while, inizializza temp una volta sola
     DMatrixRMaj temp = new DMatrixRMaj(b.numRows, 1);
 
-    double normaDiff = Funzioni.calcoloNormaDiff(A, xOld, b, diff);
+    DMatrixRMaj xDiff = new DMatrixRMaj(xNew.numRows, 1);
+    CommonOps_DDRM.subtract(xNew, xOld, xDiff);
+
+
+    double normaDiff = NormOps_DDRM.normPInf(xDiff);
+
 
     // 3. LOOP ITERATIVO
     while (normaDiff > tol && nit < maxIter) {
@@ -55,7 +60,8 @@ public class Gauss{
         CommonOps_DSCC.mult(B, xOld, temp);
         CommonOps_DDRM.subtract(b, temp, diff);
         xNew = Funzioni.solveTriangInf(A_triang, diff);
-        normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b, diff);
+        CommonOps_DDRM.subtract(xNew, xOld, xDiff);
+        normaDiff = NormOps_DDRM.normPInf(xDiff);
         nit++;
     }
 
@@ -69,10 +75,10 @@ public class Gauss{
 
         // Calcola differenza xNew - xEsatta
         DMatrixRMaj diffErr = new DMatrixRMaj(xOld.getNumRows(), 1);
-        CommonOps_DDRM.subtract(xNew, xEsatta, diffErr);
+        CommonOps_DDRM.subtract(xNew, xOld, diffErr);
 
         // Errore relativo
-        double err = NormOps_DDRM.normP2(diffErr) / NormOps_DDRM.normP2(xEsatta);
+        double err = NormOps_DDRM.normPInf(diffErr) / NormOps_DDRM.normPInf(xNew);
         return new Risultato(xNew, nit, tempoSecondi, err);
 }
 }

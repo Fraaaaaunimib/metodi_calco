@@ -45,12 +45,15 @@ public class Main {
             Risultato rJacobi = jacobi.jacobi(matrice, b, x0, 10000, tol);
             Funzioni.ritornoValori(tol, rJacobi);
             }
- /*
+
+            
+            System.out.println();
+
             System.out.println("Metodo di Gauss:");
             for(double tol : tolleranze) {
             Risultato rGauss = Gauss.gauss(matrice, b, x0, 10000, tol);
             Funzioni.ritornoValori(tol, rGauss);
-            }*/
+            }
             System.out.println("");
 
             System.out.println("Metodo del gradiente:");

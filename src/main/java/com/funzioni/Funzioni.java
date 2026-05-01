@@ -100,16 +100,45 @@ public class Funzioni {
 */
 
 public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B){
-    int n = L.numRows;
-    DMatrixRMaj X = new DMatrixRMaj(n,1);
-    for (int i = 0; i < n; i++){
-        double sum = 0.0;
-        for (int j = 0; j < i; j++){
-            sum += L.get(i,j) * X.get(j);
+    int m = L.getNumRows();
+        int n = L.getNumCols();
+
+        // 1. Controllo matrice quadrata
+        if (m != n) {
+            System.out.println("Matrix L is not a square matrix");
+            return null;
         }
-        X.set(i, (B.get(i) - sum) / L.get(i,i));
-    }
-    return X;
+
+        // 2. Creiamo il vettore risultato x denso
+        DMatrixRMaj x = new DMatrixRMaj(m, 1);
+
+        // Primo elemento: x(0) = b(0) / L(0,0)
+        x.set(0, 0, B.get(0, 0) / L.get(0, 0));
+
+        // 3. Ciclo per calcolare le componenti successive
+        for (int i = 1; i < n; i++) {
+            double somma = 0.0;
+
+            // Iteriamo solo sugli elementi diversi da zero della riga 'i'
+            // In una matrice triangolare inferiore, l'indice di colonna 'k' va da 0 a i-1.
+            for (int k = 0; k < i; k++) {
+                double valL = L.get(i, k);
+                if (valL != 0.0) {
+                    somma += valL * x.get(k, 0);
+                }
+            }
+
+            // Controllo per evitare divisione per zero sulla diagonale
+            double diagElement = L.get(i, i);
+            if (diagElement == 0.0) {
+                throw new ArithmeticException("Matrix L is singular (zero on diagonal at index " + i + ")");
+            }
+
+            double risultato = (B.get(i, 0) - somma) / diagElement;
+            x.set(i, 0, risultato);
+        }
+
+        return x;
 }
 
 public static void ritornoValori(double tol, Risultato r){
@@ -131,7 +160,7 @@ public static void ritornoValori(double tol, Risultato r){
 
         return normaDiff;
     }
-
+/*
     public static boolean metodoPotenze(DMatrixSparseCSC A, int nMax, double tol){
         DMatrixRMaj z = new DMatrixRMaj(A.numRows, 1);
         DMatrixRMaj q = new DMatrixRMaj(A.numRows, 1);
@@ -151,5 +180,6 @@ public static void ritornoValori(double tol, Risultato r){
             
         }
     }
+        */
 }
 
