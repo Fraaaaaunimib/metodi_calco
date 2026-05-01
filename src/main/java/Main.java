@@ -6,6 +6,7 @@ import com.funzioni.*;
 import com.metodi.Gauss;
 import com.metodi.Jacobi;
 import com.metodi.gradient;
+import com.metodi.gradientC;
 
 public class Main {
     public static void main(String[] args) {
@@ -56,6 +57,14 @@ public class Main {
             for(double tol : tolleranze) {
             Risultato rGradiente = gradient.gradiente(matrice, b, x0, 10000, tol);
             Funzioni.ritornoValori(tol, rGradiente);
+            }
+
+            System.out.println();
+
+            System.out.println("Metodo del gradiente coniugato:");
+            for(double tol : tolleranze) {
+            Risultato rGradienteC = gradientC.gradienteC(matrice, b, x0, 10000, tol);
+            Funzioni.ritornoValori(tol, rGradienteC);
             }
             
             numMatrice++;

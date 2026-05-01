@@ -52,7 +52,6 @@ public class Gauss{
     // 3. LOOP ITERATIVO
     while (normaDiff > tol && nit < maxIter) {
         xOld = xNew.copy();
-
         CommonOps_DSCC.mult(B, xOld, temp);
         CommonOps_DDRM.subtract(b, temp, diff);
         xNew = Funzioni.solveTriangInf(A_triang, diff);
