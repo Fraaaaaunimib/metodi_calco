@@ -63,7 +63,6 @@ public class Jacobi {
             CommonOps_DDRM.subtract(b, temp, temp);
             CommonOps_DDRM.elementDiv(temp, diagValues, temp);
             CommonOps_DDRM.addEquals(x, temp);
-
             nit++;
             normaDiff = Funzioni.calcoloNormaDiff(A, x, b, diff);
         }

@@ -51,8 +51,18 @@ public class gradient{
         Long durata = System.nanoTime() - inizio;
         double tempoSecondi = durata / 1_000_000_000.0;
 
+        DMatrixRMaj xEsatta = new DMatrixRMaj(xK.getNumRows(), 1);
+        for (int i = 0; i < xEsatta.getNumRows(); i++) {
+            xEsatta.set(i, 1.0);
+        }
+
+        // Calcola differenza xNew - xEsatta
+        DMatrixRMaj diffErr = new DMatrixRMaj(xK.getNumRows(), 1);
+        CommonOps_DDRM.subtract(xK, xEsatta, diffErr);
+
+        // Errore relativo
+        err = NormOps_DDRM.normP2(diffErr) / NormOps_DDRM.normP2(xEsatta);
+
         return new Risultato(xK, nit, tempoSecondi, err);
-
-
     }
 }
