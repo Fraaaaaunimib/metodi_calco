@@ -70,17 +70,21 @@ public class Funzioni {
         return max;
     }
 
-    public static DMatrixSparseCSC triang_inf(final DMatrixSparseCSC A){
-    DMatrixSparseCSC aT = new DMatrixSparseCSC(A.numRows, A.numCols, 0);
-    for(int i = 0; i < A.numRows; i++){
-        for(int j = 0; j < A.numCols; j++){
-            if(j > i){ // Se l'indice di colonna è maggiore di quello di riga
-                aT.set(i, j, 0.0); // Azzera l'elemento sopra la diagonale
+    public static DMatrixSparseCSC triang_inf(final DMatrixSparseCSC A) {
+
+    DMatrixSparseCSC L = new DMatrixSparseCSC(A.numRows, A.numCols, A.nz_length);
+
+    for (int i = 0; i < A.numRows; i++) {
+        for (int j = 0; j <= i; j++) {
+            double val = A.get(i, j);
+            if (val != 0.0) {
+                L.set(i, j, val);
             }
         }
     }
-    return aT;
-    }
+
+    return L;
+}
 
     /*
     public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B) {
@@ -99,46 +103,35 @@ public class Funzioni {
     }
 */
 
-public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj B){
-    int m = L.getNumRows();
-        int n = L.getNumCols();
+public static DMatrixRMaj solveTriangInf(DMatrixSparseCSC L, DMatrixRMaj b) {
 
-        // 1. Controllo matrice quadrata
-        if (m != n) {
-            System.out.println("Matrix L is not a square matrix");
-            return null;
+    int n = L.numRows;
+
+    if (L.numCols != n) {
+        throw new IllegalArgumentException("Matrice non quadrata");
+    }
+
+    DMatrixRMaj x = new DMatrixRMaj(n, 1);
+
+    for (int i = 0; i < n; i++) {
+
+        double somma = 0.0;
+
+        for (int j = 0; j < i; j++) {
+            somma += L.get(i, j) * x.get(j, 0);
         }
 
-        // 2. Creiamo il vettore risultato x denso
-        DMatrixRMaj x = new DMatrixRMaj(m, 1);
+        double diag = L.get(i, i);
 
-        // Primo elemento: x(0) = b(0) / L(0,0)
-        x.set(0, 0, B.get(0, 0) / L.get(0, 0));
-
-        // 3. Ciclo per calcolare le componenti successive
-        for (int i = 1; i < n; i++) {
-            double somma = 0.0;
-
-            // Iteriamo solo sugli elementi diversi da zero della riga 'i'
-            // In una matrice triangolare inferiore, l'indice di colonna 'k' va da 0 a i-1.
-            for (int k = 0; k < i; k++) {
-                double valL = L.get(i, k);
-                if (valL != 0.0) {
-                    somma += valL * x.get(k, 0);
-                }
-            }
-
-            // Controllo per evitare divisione per zero sulla diagonale
-            double diagElement = L.get(i, i);
-            if (diagElement == 0.0) {
-                throw new ArithmeticException("Matrix L is singular (zero on diagonal at index " + i + ")");
-            }
-
-            double risultato = (B.get(i, 0) - somma) / diagElement;
-            x.set(i, 0, risultato);
+        if (diag == 0.0) {
+            throw new ArithmeticException("Zero sulla diagonale in riga " + i);
         }
 
-        return x;
+        double valore = (b.get(i, 0) - somma) / diag;
+        x.set(i, 0, valore);
+    }
+
+    return x;
 }
 
 public static void ritornoValori(double tol, Risultato r){
