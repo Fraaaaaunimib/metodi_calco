@@ -25,14 +25,11 @@ public class Gauss {
             return null;
         }
 
-        // =========================
-        // PRE-CALCOLO
-        // =========================
         DMatrixSparseCSC L = Funzioni.triang_inf(A); // L + D
-        DMatrixSparseCSC U = new DMatrixSparseCSC(n, n, A.nz_length);
+        DMatrixSparseCSC B = new DMatrixSparseCSC(n, n, A.nz_length);
 
         // U = A - L
-        CommonOps_DSCC.add(1.0, A, -1.0, L, U, null, null);
+        CommonOps_DSCC.add(1.0, A, -1.0, L, B, null, null);
 
         // =========================
         // INIZIALIZZAZIONE
@@ -45,7 +42,7 @@ public class Gauss {
         DMatrixRMaj xDiff = new DMatrixRMaj(n, 1);
 
         int nit = 0;
-        double normaDiff = Double.MAX_VALUE;
+        double normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b, diff);
 
         long inizio = System.nanoTime();
 
@@ -55,10 +52,11 @@ public class Gauss {
         while (normaDiff > tol && nit < maxIter) {
 
             // xOld = xNew
-            xOld = xNew.copy();
+            CommonOps_DDRM.scale(1.0, xNew, xOld);
 
-            // temp = U * xOld
-            CommonOps_DSCC.mult(U, xOld, temp);
+
+            // temp = B * xOld
+            CommonOps_DSCC.mult(B, xOld, temp);
 
             // diff = b - temp
             CommonOps_DDRM.subtract(b, temp, diff);
@@ -66,12 +64,12 @@ public class Gauss {
             // risolvi L xNew = diff
             DMatrixRMaj xNext = Funzioni.solveTriangInf(L, diff);
 
-            // calcolo differenza
-            CommonOps_DDRM.subtract(xNext, xOld, xDiff);
-            normaDiff = NormOps_DDRM.normPInf(xDiff);
 
             // aggiorna soluzione
-            xNew = xNext.copy();
+            xNew = xNext;
+            // calcolo differenza
+
+            normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b, xDiff);
 
             nit++;
         }
@@ -90,7 +88,7 @@ public class Gauss {
         DMatrixRMaj diffErr = new DMatrixRMaj(n, 1);
         CommonOps_DDRM.subtract(xNew, xEsatta, diffErr);
 
-        double err = NormOps_DDRM.normPInf(diffErr) / NormOps_DDRM.normPInf(xEsatta);
+        double err = NormOps_DDRM.normP2(diffErr) / NormOps_DDRM.normP2(xEsatta);
 
         return new Risultato(xNew, nit, tempoSecondi, err);
     }

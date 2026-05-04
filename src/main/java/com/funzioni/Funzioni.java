@@ -71,18 +71,17 @@ public class Funzioni {
     }
 
     public static DMatrixSparseCSC triang_inf(final DMatrixSparseCSC A) {
-
     DMatrixSparseCSC L = new DMatrixSparseCSC(A.numRows, A.numCols, A.nz_length);
-
-    for (int i = 0; i < A.numRows; i++) {
-        for (int j = 0; j <= i; j++) {
-            double val = A.get(i, j);
-            if (val != 0.0) {
-                L.set(i, j, val);
+    for (int col = 0; col < A.numCols; col++) {
+        int idx0 = A.col_idx[col];
+        int idx1 = A.col_idx[col + 1];
+        for (int idx = idx0; idx < idx1; idx++) {
+            int row = A.nz_rows[idx];
+            if (row >= col) { // triangolare inferiore: riga >= colonna
+                L.set(row, col, A.nz_values[idx]);
             }
         }
     }
-
     return L;
 }
 
