@@ -1,12 +1,10 @@
 package com.metodi;
 
-import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import com.funzioni.*;
-import java.util.Arrays;
 
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
@@ -83,7 +81,5 @@ public class Jacobi {
         double err = NormOps_DDRM.normP2(diffErr) / NormOps_DDRM.normP2(xEsatta);
         return new Risultato(x, nit, tempoSecondi, err);
     }
-
-    
 
 }
