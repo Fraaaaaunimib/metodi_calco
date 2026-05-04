@@ -1,2 +1,7 @@
+Main.class
 com/funzioni/Funzioni.class
 com/metodi/Jacobi.class
+com/metodi/gradientC.class
+com/metodi/Gauss.class
+com/funzioni/Risultato.class
+com/metodi/gradient.class

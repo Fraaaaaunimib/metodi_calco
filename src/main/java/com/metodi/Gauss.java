@@ -5,91 +5,71 @@ import com.funzioni.*;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
 public class Gauss {
-
+    
+    /*
+    Implementazione del metodo di Gauss-Seidel per matrici sparse
+    Parametri: A (matrice sparsa di partenza), b (vettore di termini noti), x0 (vettore nullo), maxIter (numero massimo di iterazioni, deve essere >=20000), tol (tolleranza)
+    Ritorno: oggetto di tipo Risultato (numero di iterazioni, tempo di esecuzione, errore relativo)
+    Errore:
+    - Se la matrice A non è quadrata
+    - Se la lunghezza di x0 è diversa da A
+    */
     public static Risultato gauss(DMatrixSparseCSC A, DMatrixRMaj b, DMatrixRMaj x0, int maxIter, double tol) {
-
+        
         int n = A.numCols;
         int m = A.numRows;
-
-        if (m != n) {
-            System.out.println("Matrice A non è quadrata");
-            return null;
+        
+        try {
+            Funzioni.controlloDimensione(n, m, x0.numRows);
+        } catch (Exception e){
+            System.err.println(e);
         }
-
-        if (x0.numRows != n) {
-            System.out.println("Dimensione di x0 errata");
-            return null;
-        }
-
-        DMatrixSparseCSC L = Funzioni.triang_inf(A); // L + D
+        
+        // L = triangolare inferiore di A
+        DMatrixSparseCSC L = Funzioni.triang_inf(A);
+        // B = A - L
         DMatrixSparseCSC B = new DMatrixSparseCSC(n, n, A.nz_length);
-
-        // U = A - L
+        
         CommonOps_DSCC.add(1.0, A, -1.0, L, B, null, null);
-
-        // =========================
-        // INIZIALIZZAZIONE
-        // =========================
+        
         DMatrixRMaj xNew = x0.copy();
         DMatrixRMaj xOld = new DMatrixRMaj(n, 1);
-
+        
         DMatrixRMaj temp = new DMatrixRMaj(n, 1);
         DMatrixRMaj diff = new DMatrixRMaj(n, 1);
-        DMatrixRMaj xDiff = new DMatrixRMaj(n, 1);
-
+        
         int nit = 0;
-        double normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b, diff);
-
+        
+        double normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b);
+        
         long inizio = System.nanoTime();
-
-        // =========================
-        // CICLO ITERATIVO
-        // =========================
+        
         while (normaDiff > tol && nit < maxIter) {
-
+            
             // xOld = xNew
             CommonOps_DDRM.scale(1.0, xNew, xOld);
-
-
-            // temp = B * xOld
+            
+            // diff = b - B*xOld
             CommonOps_DSCC.mult(B, xOld, temp);
-
-            // diff = b - temp
             CommonOps_DDRM.subtract(b, temp, diff);
-
+            
             // risolvi L xNew = diff
             DMatrixRMaj xNext = Funzioni.solveTriangInf(L, diff);
-
-
+            
             // aggiorna soluzione
             xNew = xNext;
-            // calcolo differenza
-
-            normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b, xDiff);
-
+            
+            normaDiff = Funzioni.calcoloNormaDiff(A, xNew, b);
+            
             nit++;
         }
-
+        
         long durata = System.nanoTime() - inizio;
         double tempoSecondi = durata / 1_000_000_000.0;
-
-        // =========================
-        // ERRORE (se soluzione esatta = [1,...,1])
-        // =========================
-        DMatrixRMaj xEsatta = new DMatrixRMaj(n, 1);
-        for (int i = 0; i < n; i++) {
-            xEsatta.set(i, 0, 1.0);
-        }
-
-        DMatrixRMaj diffErr = new DMatrixRMaj(n, 1);
-        CommonOps_DDRM.subtract(xNew, xEsatta, diffErr);
-
-        double err = NormOps_DDRM.normP2(diffErr) / NormOps_DDRM.normP2(xEsatta);
-
-        return new Risultato(xNew, nit, tempoSecondi, err);
+        
+        return new Risultato(nit, tempoSecondi, Funzioni.calcoloErroreRelativo(n, xNew));
     }
 }

@@ -9,24 +9,31 @@ import com.metodi.gradient;
 import com.metodi.gradientC;
 
 public class Main {
-    public static void main(String[] args) {
-        DMatrixSparseCSC spa1 = Funzioni.caricaMatriceManualmente("matrici/spa1.mtx");
-        DMatrixSparseCSC spa2 = Funzioni.caricaMatriceManualmente("matrici/spa2.mtx");
-        DMatrixSparseCSC vem1 = Funzioni.caricaMatriceManualmente("matrici/vem1.mtx");
-        DMatrixSparseCSC vem2 = Funzioni.caricaMatriceManualmente("matrici/vem2.mtx");
 
-        String[] nomiMatrici = {"spa1", "spa2", "vem1", "vem2"};
+    static int maxIter = 20000;
+    
+    public static void main(String[] args ) {
 
-        double[] tolleranze = {1e-4, 1e-6, 1e-8, 1e-10};
+        if(args.length == 0){
+            System.err.println("Non hai messo nessun argoment");
+            return;
+        }
+        else if(args.length == 1){
+            System.err.println("Hai messo un solo argomento, ne servono 2");
+            return;
+        }
 
-        Jacobi jacobi = new Jacobi();
-        //Gauss gauss = new Gauss();
-
-        int numMatrice = 0;
-
+        String nomeMatrice = args[0];
+        double tol = 0.0;
+        try{
+            tol = Double.parseDouble(args[1]);
+        } catch(NumberFormatException e){
+            System.err.println("Eccezione: " + e);
+            return;
+        }
+        DMatrixSparseCSC matrice = Funzioni.caricaMatriceManualmente(nomeMatrice);
         
-        for (DMatrixSparseCSC matrice : new DMatrixSparseCSC[]{spa1, spa2, vem1, vem2}) {
-            DMatrixRMaj x0 = new DMatrixRMaj(matrice.numRows, 1);
+        DMatrixRMaj x0 = new DMatrixRMaj(matrice.numRows, 1);
             for(int i = 0; i < x0.getNumRows(); i++) {
                 x0.set(i, 0.0);
             }
@@ -39,39 +46,20 @@ public class Main {
             DMatrixRMaj b = new DMatrixRMaj(matrice.numRows, 1);
             CommonOps_DSCC.mult(matrice, x, b);
 
-            System.out.println("Matrice: " + nomiMatrici[numMatrice]);
-            System.out.println("Metodo di Jacobi:");
-            for(double tol : tolleranze) {
-            Risultato rJacobi = jacobi.jacobi(matrice, b, x0, 10000, tol);
-            Funzioni.ritornoValori(tol, rJacobi);
-            }
-
-            
-            System.out.println();
-
-            System.out.println("Metodo di Gauss:");
-            for(double tol : tolleranze) {
-            Risultato rGauss = Gauss.gauss(matrice, b, x0, 10000, tol);
-            Funzioni.ritornoValori(tol, rGauss);
-            }
-            System.out.println("");
-
-            System.out.println("Metodo del gradiente:");
-            for(double tol : tolleranze) {
-            Risultato rGradiente = gradient.gradiente(matrice, b, x0, 10000, tol);
-            Funzioni.ritornoValori(tol, rGradiente);
-            }
-
-            System.out.println();
-
-            System.out.println("Metodo del gradiente coniugato:");
-            for(double tol : tolleranze) {
-            Risultato rGradienteC = gradientC.gradienteC(matrice, b, x0, 10000, tol);
-            Funzioni.ritornoValori(tol, rGradienteC);
-            }
-            
-            numMatrice++;
-    }
-
+        System.out.println("Metodo di Jacobi");
+        Risultato rJacobi = Jacobi.jacobi(matrice, b, x0, maxIter, tol);
+        Funzioni.ritornoValori(tol, rJacobi);
+        System.out.println();
+        System.out.println("Metodo di Gauss");
+        Risultato rGauss = Gauss.gauss(matrice, b, x0, maxIter, tol);
+        Funzioni.ritornoValori(tol, rGauss);
+        System.out.println();
+        System.out.println("Metodo del Gradiente");
+        Risultato rGradiente = gradient.gradiente(matrice, b, x0, maxIter, tol);
+        Funzioni.ritornoValori(tol, rGradiente);
+        System.out.println();
+        System.out.println("Metodo del Gradiente Coniugato");
+        Risultato rGradienteC = gradientC.gradienteC(matrice, b, x0, maxIter, tol);
+        Funzioni.ritornoValori(tol, rGradienteC);
     }
 }
