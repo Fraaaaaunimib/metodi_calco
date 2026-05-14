@@ -1,14 +1,18 @@
-<project xmlns="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <groupId>com.mycompany.app</groupId>
     <artifactId>my-module</artifactId>
     <version>1</version>
+
     <dependencies>
         <dependency>
-    <groupId>org.ejml</groupId>
-    <artifactId>ejml-all</artifactId>
-    <version>0.44.0</version>
-</dependency>
+            <groupId>org.ejml</groupId>
+            <artifactId>ejml-all</artifactId>
+            <version>0.44.0</version>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -24,6 +28,15 @@
                 <version>3.11.0</version>
                 <configuration>
                     <release>11</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <mainClass>com.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
