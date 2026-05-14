@@ -24,6 +24,9 @@ public class Gauss {
         
         try {
             Funzioni.controlloDimensione(n, m, x0.numRows);
+            if (!Funzioni.isNotDiagonaleZero(A)) {
+            throw new Exception("La matrice A deve avere elementi non zero sulla diagonale.");
+            }
         } catch (Exception e){
             System.err.println(e);
         }
