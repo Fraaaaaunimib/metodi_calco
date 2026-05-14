@@ -4,6 +4,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.dense.row.CommonOps_DDRM;
 import com.funzioni.*;
+import org.ejml.sparse.csc.MatrixFeatures_DSCC;
 
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
@@ -23,11 +24,16 @@ public class Jacobi {
         int m = A.numRows;
         int L = x0.getNumRows();
 
+
         try {
             Funzioni.controlloDimensione(n, m, L);
             if (!Funzioni.isNotDiagonaleZero(A)) {
             throw new Exception("La matrice A deve avere elementi non zero sulla diagonale.");
             }
+            else if(!MatrixFeatures_DSCC.isSymmetric(A, tol)){
+            throw new Exception("La matrice non è simmetrica");
+            }
+            
         } catch (Exception e){
             System.err.println(e);
         }

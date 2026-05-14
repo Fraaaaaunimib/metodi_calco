@@ -5,6 +5,7 @@ import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.sparse.csc.CommonOps_DSCC;
+import org.ejml.sparse.csc.MatrixFeatures_DSCC;
 
 import com.funzioni.*;
 
@@ -21,6 +22,9 @@ public class gradientC{
 
         try {
             Funzioni.controlloDimensione(A.numCols, A.numRows, x0.numRows);
+            if(!MatrixFeatures_DSCC.isSymmetric(A, tol)){
+            throw new Exception("La matrice non è simmetrica");
+            }
         } catch (Exception e){
             System.err.println(e);
         }
