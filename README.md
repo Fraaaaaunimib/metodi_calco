@@ -1,5 +1,5 @@
 # Progetto 1-Alternativo
-Metodi del Calcolo Scientifico
+Metodi del Calcolo Scientifico 2025/2026
 
 Cattaneo Francesco (matricola 900411), Carpio Herreros Marco (matricola 899802)
 
